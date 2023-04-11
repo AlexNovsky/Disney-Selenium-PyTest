@@ -11,19 +11,18 @@ home_page_img = '//*[@class="disney-img"]'
 home_page_menu = '//*[@id="goc-desktop-global"]'
 banner_iframe = 'iframe[aria-label="Advertisement"]'
 banner_close_button = '//*[@id="overlay"]//*[@class="sprite close"]'
-driver = webdriver.Chrome()
 
+driver = webdriver.Chrome()
+driver.get(home_page_url)
 
 @pytest.mark.homepage_valid
 def test_homePageIsValid():
-    driver.get(home_page_url)
     signin_button_text = driver.find_element(By.XPATH, sign_in_button).text
     if not is_displayed(By.XPATH, home_page_menu) and not is_displayed(By.XPATH, home_page_img):
         return False
     if not signin_button_text == 'SIGN IN':
         return False
-    assert signin_button_text == 'SIGN IN'
-
+    assert signin_button_text == 'SIGN IN' and driver.title == 'Disney.com | The official home for all things Disney'
 
 def test_closeMainBanner():
     wait = WebDriverWait(driver, 5)
