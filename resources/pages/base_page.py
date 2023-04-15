@@ -1,20 +1,96 @@
-from selenium.webdriver.common.by import By
+from selenium.webdriver import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.wait import WebDriverWait
 
-# class BasePage:
-#     """Base class for every page object of the web application under test
-#     Includes all basic page methods, applicable to every page, like (get_element,
-#     is_displayed, click, enter_text, get_element_text, and many more)
-#     Requires app_data dictionary (containing WebDriver, test data, and other settings) as an input
-#     """
-#
-driver = webdriver.Chrome()
+class BasePage:
+    """Base class for every page object of the web application under test
+    Includes all basic page methods, applicable to every page, like (is_displayed,
+    click, enter_text, get_title, and many more)
+    """
 
+    def __init__(self, driver) -> None:
+        self.driver = driver
 
-def is_displayed(by, locator):
-    try:
-        return driver.find_element(By.XPATH, locator).is_displayed()
-        # return self.driver.find_element(by, locator).is_displayed()
-    except NoSuchElementException:
-        return False
+    def test_click(self, locator):
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(locator)).click()
+
+    def test_send_keys(self, locator, text):
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(locator)).send_keys(text)
+    def is_displayed(self, locator):
+        """Check if an element with the provided locator is displayed or not
+
+        :param locator:         2-item tuple containing: (locator strategy, locator identifying string)
+        :return:                True if the element is displayed
+                                False if the element is hidden or does not exist
+        """
+        try:
+            return self.driver.find_element(locator).is_displayed()
+        except NoSuchElementException:
+            return False
+
+    def open_url(self, url):
+        """Open the provided url in a web browser
+
+           :param url:             String, to be typed into the text field
+           :return:                None
+           """
+        self.driver.get(url)
+
+    def click(self, locator):
+        """Click action on provided element
+
+                   :param locator:         2-item tuple containing: (locator strategy, locator identifying string)
+                   :return:                None
+                   """
+        self.driver.find_element(locator).click()
+
+    def scroll_to(self, locator):
+        """Scroll to the provided element. From the nature of this command
+            bottom of the element will be at the bottom of the visible part
+            of the web page.
+
+                   :param locator:         2-item tuple containing: (locator strategy, locator identifying string)
+                   :return:                None
+                   """
+        ActionChains(self.driver).scroll_to_element(locator).perform()
+
+    def hover_to(self, locator):
+        """Hover over an element with the provided locator
+
+        :param locator:         2-item tuple containing: (locator strategy, locator identifying string)
+        :return:                None
+        """
+        ActionChains(self.driver).move_to_element(locator).perform()
+
+    def select_item_from_dropdown(self, item_text, dd_locator):
+        """Select a drop-down item with the provided text from a drop-down menu with the provided locator
+
+        :param item_text:       String, representing the text contained in a drop-down item in a drop-down menu
+                                with the provided dd_locator
+        :param dd_locator:      One of: - WebElement object
+                                        - String Key to find a locator xpath string within page class's attributes
+                                        - 2-item tuple containing: (locator strategy, locator identifying string)
+        :return:                None
+        """
+        select = Select(dd_locator)
+        select.select_by_visible_text(item_text)
+    def is_clickable(self, locator):
+        """Check if an element with the provided locator is clickable or not
+
+                :param locator:         2-item tuple containing: (locator strategy, locator identifying string)
+                :return:                True if the element is displayed
+                                        False if the element is hidden or does not exist
+                """
+        try:
+            wait = WebDriverWait(self.driver, 5)
+            wait.until(EC.element_to_be_clickable(locator))
+        except NoSuchElementException:
+            return False
+
+    def get_title(self, title):
+        """Return the page title of the currently active browser tab
+        :return:                String, representing the page title of the currently active browser tab
+        """
+        return self.driver.title
