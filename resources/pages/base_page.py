@@ -112,3 +112,6 @@ class BasePage:
         :return:                none
         """
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(locator)).send_keys(text)
+
+    def clear_field(self, locator):
+        field = self.driver.find_element(locator).clear()
