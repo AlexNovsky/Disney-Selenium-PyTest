@@ -28,7 +28,7 @@ class SignInPage(BasePage):
 
     def signInIsLoaded(self) -> bool:
         """
-        Chec if sign-in menu is loaded and click Sign-In button
+        Check if sign-in menu is loaded and click Sign-In button
         :return:        True if frame is displayed
                         False if frame is hidden ot not exist
         """
@@ -95,7 +95,12 @@ class SignInPage(BasePage):
         if not self.is_displayed(self.logged_in):
             return False
 
-    def signOut(self):
+    def signOut(self) -> bool:
+        """
+        Signing out user and validating that sign out was successful
+        :return:        True if user signed out
+                        False if user still signed in
+        """
         self.is_clickable(self.my_account_btn)
         if not self.is_clickable(self.my_account_btn):
             return False
@@ -104,3 +109,6 @@ class SignInPage(BasePage):
         if not self.is_clickable(self.sign_out_btn):
             return False
         self.click(self.sign_out_btn)
+        signin_button_text = self.driver.find_element(self.sign_in_button).text
+        if not signin_button_text == 'SIGN IN':
+            return False
